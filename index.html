@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CBMMT | Gestão de Portfólio, Editais & Sprints (Kanban)</title>
+  <meta name="description" content="Painel executivo de gestão de portfólio de projetos, radar de editais e oportunidades e modelo ágil de sprints do Corpo de Bombeiros Militar do Estado de Mato Grosso.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Design System CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="navbar-container">
+      
+      <!-- Brand & Organization Title -->
+      <a href="#" class="brand-section">
+        <div class="brand-badge" title="Corpo de Bombeiros Militar de Mato Grosso">🚒</div>
+        <div class="brand-info">
+          <h1>
+            CBMMT Portfólio
+            <span class="brand-tag">DGE • Projetos</span>
+          </h1>
+          <p class="brand-subtitle">Gestão Estratégica, Editais de Recursos e Ciclos Ágeis</p>
+        </div>
+      </a>
+
+      <!-- View Selector Tabs -->
+      <nav class="view-tabs" aria-label="Modos de Visualização">
+        <button class="tab-btn active" data-view="execucao" id="tab-execucao">
+          <span>📌 Projetos em Execução</span>
+          <span class="tab-count" id="badge-count-exec">0</span>
+        </button>
+        <button class="tab-btn" data-view="editais" id="tab-editais">
+          <span>🎯 Editais & Oportunidades</span>
+          <span class="tab-count" id="badge-count-edit">0</span>
+        </button>
+        <button class="tab-btn" data-view="sprints" id="tab-sprints">
+          <span>⚡ Modelo de Sprints</span>
+          <span class="tab-count" id="badge-count-sprint">0</span>
+        </button>
+        <button class="tab-btn" data-view="kpis" id="tab-kpis">
+          <span>📊 Dashboard & KPIs</span>
+        </button>
+        <button class="tab-btn" data-view="tabela" id="tab-tabela">
+          <span>📋 Tabela Geral</span>
+        </button>
+      </nav>
+
+      <!-- Global Actions -->
+      <div class="navbar-actions">
+        <button class="btn btn-secondary" id="btn-github-guide" title="Instruções para Hospedar no GitHub Pages">
+          <span>🚀 Publicar no GitHub</span>
+        </button>
+        <button class="btn btn-primary" id="btn-new-item" title="Cadastrar Projeto, Edital ou Tarefa">
+          <span>➕ Novo Item</span>
+        </button>
+        <button class="btn btn-secondary" id="btn-export" title="Exportar e Importar Dados">
+          <span>💾 Backup</span>
+        </button>
+        <button class="btn-icon" id="btn-theme-toggle" title="Alternar Modo Escuro / Claro">
+          <span id="theme-toggle-icon">☀️</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Filter & Real-Time Search Bar -->
+  <section class="controls-bar">
+    <div class="controls-container">
+      
+      <!-- Live Search Box -->
+      <div class="search-box">
+        <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <input type="text" class="search-input" id="search-input" placeholder="Buscar por título, recurso, unidade, ID ou processo...">
+      </div>
+
+      <!-- Quick Dropdown Filters -->
+      <div class="filters-group">
+        <select class="filter-select" id="filter-fonte" aria-label="Filtrar por Fonte">
+          <option value="all">Todas as Fontes / Órgãos</option>
+        </select>
+
+        <select class="filter-select" id="filter-unidade" aria-label="Filtrar por Unidade">
+          <option value="all">Todas as Unidades / Regiões</option>
+        </select>
+
+        <select class="filter-select" id="filter-prioridade" aria-label="Filtrar por Prioridade">
+          <option value="all">Todas as Prioridades</option>
+          <option value="Crítica">Prioridade: Crítica</option>
+          <option value="Alta">Prioridade: Alta</option>
+          <option value="Média">Prioridade: Média</option>
+          <option value="Baixa">Prioridade: Baixa</option>
+        </select>
+      </div>
+
+      <!-- Executive KPI Micro Stats -->
+      <div class="stats-summary">
+        <div class="stat-item" title="Total de Recursos Captados em Portfólio">
+          <span>Captado:</span>
+          <span class="stat-val highlight" id="stat-total-captado">R$ 0,00</span>
+        </div>
+        <div class="stat-item" title="Editais e Chamadas Mapeadas">
+          <span>Oportunidades:</span>
+          <span class="stat-val" id="stat-total-editais">0</span>
+        </div>
+        <div class="stat-item">
+          <span>Total Itens:</span>
+          <span class="stat-val" id="stat-total-projetos">0</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Sprint Banner (Displayed in Sprint Mode) -->
+  <section class="sprint-banner" id="sprint-banner-section" style="display: none;">
+    <div class="sprint-banner-container">
+      
+      <div class="sprint-info-group">
+        <span class="sprint-code-pill" id="sprint-banner-code">SPRINT-2026.1</span>
+        <div class="sprint-title-area">
+          <h3 id="sprint-banner-title">Sprint 2026.1: Regularização CONSEGs & Juizados Especiais</h3>
+          <p class="sprint-meta-text" id="sprint-banner-period">Período: 01/03/2026 a 31/03/2026</p>
+          <p class="sprint-meta-text" id="sprint-banner-meta" style="color: var(--text-primary); margin-top: 0.15rem; font-weight: 600;">
+            🎯 Meta: Concluir documentação dos 15 CONSEGs e protocolar nas Varas Criminais.
+          </p>
+        </div>
+      </div>
+
+      <div class="sprint-progress-group">
+        <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 0.35rem;">
+          <label for="sprint-selector" style="font-size: 0.725rem; font-weight: 700; color: var(--text-secondary);">Selecionar Sprint:</label>
+          <select class="filter-select" id="sprint-selector" style="background: var(--bg-surface); border-color: rgba(6, 182, 212, 0.4);"></select>
+        </div>
+
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="sprint-progress-fill" style="width: 45%;"></div>
+          </div>
+          <div class="progress-label">
+            <span id="sprint-progress-text">45% Concluído</span>
+            <span id="sprint-points-text">12/26 pts</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Main View Area -->
+  <main class="main-wrapper" id="view-content-root">
+    <!-- Dynamic Kanban boards, KPIs or Table will render here -->
+  </main>
+
+  <!-- Modal: Item Detail (Card Inspector) -->
+  <div class="modal-overlay" id="modal-detail" role="dialog" aria-modal="true">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <h3 id="modal-detail-title">Detalhes do Item</h3>
+        <button class="modal-close-btn" data-close-modal="modal-detail" aria-label="Fechar">✕</button>
+      </div>
+      <div class="modal-body" id="modal-detail-body">
+        <!-- Injected via JavaScript -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal="modal-detail">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Add New Item -->
+  <div class="modal-overlay" id="modal-new-item" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Adicionar Novo Item ao Portfólio</h3>
+        <button class="modal-close-btn" data-close-modal="modal-new-item" aria-label="Fechar">✕</button>
+      </div>
+      <form id="form-new-item">
+        <div class="modal-body">
+          
+          <div class="form-group">
+            <label class="form-label" for="new-item-type">Tipo de Registro:</label>
+            <select class="form-select" id="new-item-type" required>
+              <option value="projeto">Projeto em Execução (Recurso Captado)</option>
+              <option value="edital">Edital / Oportunidade de Captação</option>
+              <option value="tarefa">Tarefa do Ciclo de Sprint</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-item-titulo">Título / Objeto:</label>
+            <input type="text" class="form-input" id="new-item-titulo" placeholder="Ex: Aquisição de viaturas de resgate para o 2º BBM" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" for="new-item-column">Fase Inicial (Coluna Kanban):</label>
+              <select class="form-select" id="new-item-column" required></select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="new-item-prioridade">Prioridade:</label>
+              <select class="form-select" id="new-item-prioridade" required>
+                <option value="Crítica">Crítica</option>
+                <option value="Alta" selected>Alta</option>
+                <option value="Média">Média</option>
+                <option value="Baixa">Baixa</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label" id="label-fonte" for="new-item-fonte">Patrocinador / Fonte:</label>
+              <input type="text" class="form-input" id="new-item-fonte" placeholder="Ex: FNSP, Emenda Parlamentar, MPE">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" id="label-unidade" for="new-item-unidade">Unidade Atendida:</label>
+              <input type="text" class="form-input" id="new-item-unidade" placeholder="Ex: 1º BBM, BEA, Poconé">
+            </div>
+          </div>
+
+          <div class="form-group" id="group-valor">
+            <label class="form-label" for="new-item-valor">Valor Estimado (R$):</label>
+            <input type="number" step="0.01" class="form-input" id="new-item-valor" placeholder="0.00">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="new-item-desc">Observações / Detalhes:</label>
+            <textarea class="form-textarea" id="new-item-desc" placeholder="Detalhes técnicos, justificativas e informações de contato..."></textarea>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal="modal-new-item">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Salvar no Portfólio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: GitHub Publication Guide -->
+  <div class="modal-overlay" id="modal-github-guide" role="dialog" aria-modal="true">
+    <div class="modal-box modal-lg">
+      <div class="modal-header">
+        <h3>Como Publicar no GitHub (Pages & Projects)</h3>
+        <button class="modal-close-btn" data-close-modal="modal-github-guide" aria-label="Fechar">✕</button>
+      </div>
+      <div class="modal-body">
+        
+        <div class="guide-step">
+          <h4><span class="step-num">1</span> Publicar o Painel Interativo no GitHub Pages (Online Grátis)</h4>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.75rem;">
+            Este painel foi estruturado sem dependências complexas (HTML, CSS e JS modernos). Basta enviar para o repositório no GitHub:
+          </p>
+          <div class="code-box">
+            <pre># 1. No terminal da pasta do projeto:
+git init
+git add .
+git commit -m "feat: Painel Kanban de Gestao de Portfolio CBMMT"
+git branch -M main
+git remote add origin https://github.com/SEU-USUARIO/cbmmt-portfolio.git
+git push -u origin main</pre>
+          </div>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-top:0.6rem;">
+            Em seguida, no seu GitHub vá em: <strong>Settings &gt; Pages &gt; Branch: main &gt; Save</strong>.
+            Em 60 segundos o painel estará acessível no link público: <br>
+            <code>https://SEU-USUARIO.github.io/cbmmt-portfolio/</code>
+          </p>
+        </div>
+
+        <div class="guide-step">
+          <h4><span class="step-num">2</span> Usar o GitHub Projects (Kanban Nativo do GitHub)</h4>
+          <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.75rem;">
+            Se sua equipe deseja gerenciar as tarefas diretamente pelas <strong>Issues</strong> e pelo <strong>GitHub Projects (v2)</strong>:
+          </p>
+          <ul style="font-size:0.85rem; color:var(--text-secondary); margin-left:1.5rem; line-height:1.7;">
+            <li>No repositório, clique na aba <strong>Projects &gt; New project &gt; Board</strong>.</li>
+            <li>Crie os <strong>Custom Fields</strong>: <code>Valor (Number)</code>, <code>Fonte (Single select)</code>, <code>Unidade (Single select)</code>, <code>Sprint (Iteration)</code>.</li>
+            <li>Configure as colunas recomendadas (já prontas na pasta <code>.github/</code> que criamos neste projeto).</li>
+            <li>Os modelos de Issue para abertura de novos projetos, editais e tarefas de sprint já foram gerados na pasta <code>.github/ISSUE_TEMPLATE/</code>!</li>
+          </ul>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-close-modal="modal-github-guide">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Data Backup, Export & Import -->
+  <div class="modal-overlay" id="modal-backup" role="dialog" aria-modal="true">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Gestão de Dados & Backup</h3>
+        <button class="modal-close-btn" data-close-modal="modal-backup" aria-label="Fechar">✕</button>
+      </div>
+      <div class="modal-body">
+        
+        <p style="font-size:0.85rem; color:var(--text-secondary);">
+          Você pode exportar os dados atualizados para manter backups ou alimentar sistemas externos (Excel, PowerBI, SIGAdoc).
+        </p>
+
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0.5rem;">
+          <button class="btn btn-secondary" id="btn-export-json" style="justify-content: flex-start; padding: 0.75rem 1rem;">
+            <span>📦 Exportar Portfólio Completo (JSON)</span>
+          </button>
+          <button class="btn btn-secondary" id="btn-export-csv" style="justify-content: flex-start; padding: 0.75rem 1rem;">
+            <span>📊 Exportar Planilha Consolidada (CSV para Excel)</span>
+          </button>
+          
+          <input type="file" id="file-import-input" accept=".json" style="display: none;">
+          <button class="btn btn-secondary" id="btn-import-json" style="justify-content: flex-start; padding: 0.75rem 1rem;">
+            <span>📥 Importar Dados de Backup (JSON)</span>
+          </button>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid var(--border-subtle); margin: 0.75rem 0;">
+
+        <div>
+          <button class="btn btn-secondary" id="btn-reset-data" style="color: #f87171; border-color: rgba(220, 38, 38, 0.3); width: 100%; justify-content: center;">
+            <span>⚠️ Restaurar Dados Originais das Planilhas CBMMT</span>
+          </button>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-close-modal="modal-backup">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden Container for Toasts -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Data Script (Preloaded from CBMMT Worksheets) -->
+  <script src="data.js"></script>
+
+  <!-- Interactive Logic Engine -->
+  <script src="app.js"></script>
+
+</body>
+</html>
